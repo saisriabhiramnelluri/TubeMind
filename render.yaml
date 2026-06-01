@@ -1,0 +1,34 @@
+# render.yaml — Render Blueprint for TubeMind
+# Deploy: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: tubemind
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: DATABASE_URL
+        sync: false  # Supabase PostgreSQL connection string — set manually
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
+      - key: CHUNK_SIZE
+        value: "500"
+      - key: CHUNK_OVERLAP
+        value: "100"
+      - key: TOP_K
+        value: "5"
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: FRONTEND_URL
+        sync: false  # Optional: Not required if using the vercel.json API proxy
+      - key: PYTHON_VERSION
+        value: "3.11"
+    healthCheckPath: /api/health

@@ -1,0 +1,29 @@
+# Core Framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# LLM - Google Gemini
+google-genai>=1.0.0
+
+# Embeddings
+sentence-transformers>=3.0.0
+
+# Vector Store
+faiss-cpu>=1.9.0
+numpy>=1.26.0
+
+# YouTube
+youtube-transcript-api>=0.6.0
+yt-dlp>=2024.0.0
+
+# Database — Supabase PostgreSQL via asyncpg
+asyncpg>=0.30.0
+sqlalchemy[asyncio]>=2.0.0
+
+# Middleware & Utilities
+python-multipart>=0.0.9
+
+# SSE Streaming
+sse-starlette>=2.0.0

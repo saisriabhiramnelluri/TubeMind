@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TubeMind — AI-powered understanding for every YouTube video. Transforms videos into searchable, interactive conversations using Retrieval-Augmented Generation.">
+    <title>TubeMind — AI-Powered Video Understanding</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css?v=2.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+</head>
+<body>
+    <div class="app-container">
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>TubeMind</h1>
+                        <span class="logo-subtitle">AI Video Understanding</span>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;">
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark theme">
+                        <!-- Sun icon (shown in dark mode → click to go light) -->
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        <!-- Moon icon (shown in light mode → click to go dark) -->
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Close sidebar">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- New Chat -->
+            <div class="new-chat-section">
+                <button class="btn-new-chat" id="newChatBtn" aria-label="Start new conversation">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    New Chat
+                </button>
+            </div>
+
+            <!-- URL Input -->
+            <div class="ingest-section">
+                <label class="input-label" for="youtubeUrl">Add YouTube Video</label>
+                <div class="url-input-group">
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        <input
+                            type="url"
+                            id="youtubeUrl"
+                            placeholder="Paste YouTube URL..."
+                            autocomplete="off"
+                        >
+                    </div>
+                    <button class="btn btn-primary btn-ingest" id="ingestBtn" title="Process Video" aria-label="Add video to knowledge base">
+                        <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        <span class="btn-text">Add</span>
+                        <div class="btn-loader" hidden>
+                            <div class="spinner"></div>
+                        </div>
+                    </button>
+                </div>
+                <div class="ingest-status" id="ingestStatus" hidden>
+                    <div class="status-bar">
+                        <div class="status-progress" id="statusProgress"></div>
+                    </div>
+                    <p class="status-text" id="statusText">Processing...</p>
+                </div>
+            </div>
+
+            <!-- Video List -->
+            <div class="videos-section">
+                <div class="section-header">
+                    <h2>Your Videos</h2>
+                    <span class="video-count" id="videoCount">0</span>
+                </div>
+                <div class="videos-list" id="videosList">
+                    <div class="empty-videos" id="emptyVideos">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>
+                        </svg>
+                        <p>No videos yet</p>
+                        <span>Paste a YouTube URL above to get started</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ── Main Content ── -->
+        <main class="main-content">
+            <!-- Mobile Header -->
+            <div class="mobile-header">
+                <button class="sidebar-open-btn" id="sidebarOpenBtn" aria-label="Open sidebar">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                </button>
+                <span class="mobile-title">TubeMind</span>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="chat-container" id="chatContainer" role="main">
+                <!-- Welcome Screen -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-icon">
+                        <div class="welcome-glow"></div>
+                        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="#B91C1C" stroke="none"/>
+                        </svg>
+                    </div>
+                    <h2>TubeMind</h2>
+                    <p>AI-powered understanding for every YouTube video. Paste a video URL, then ask questions to get answers with timestamp citations.</p>
+
+                    <div class="welcome-features">
+                        <div class="feature-card">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <span>Natural language Q&A</span>
+                        </div>
+                        <div class="feature-card">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>Timestamp citations</span>
+                        </div>
+                        <div class="feature-card">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                            <span>Multi-video knowledge</span>
+                        </div>
+                    </div>
+
+                    <!-- Suggested Prompts -->
+                    <div class="suggested-prompts" id="suggestedPrompts">
+                        <button class="prompt-chip" data-prompt="Summarize this video">Summarize this video</button>
+                        <button class="prompt-chip" data-prompt="Explain the key concepts">Explain the key concepts</button>
+                        <button class="prompt-chip" data-prompt="What are the actionable insights?">What are the actionable insights?</button>
+                        <button class="prompt-chip" data-prompt="Create study notes">Create study notes</button>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chatMessages" hidden aria-live="polite" aria-label="Chat conversation"></div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <div class="video-filter" id="videoFilter" hidden>
+                        <span class="filter-label">Asking about:</span>
+                        <span class="filter-video" id="filterVideoName">All Videos</span>
+                        <button class="filter-clear" id="filterClear" title="Clear filter">&times;</button>
+                    </div>
+                    <div class="input-row">
+                        <textarea
+                            id="chatInput"
+                            placeholder="Ask anything about this video..."
+                            rows="1"
+                            disabled
+                            aria-label="Type your question"
+                        ></textarea>
+                        <button class="btn btn-send" id="sendBtn" disabled title="Send question" aria-label="Send question">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14-7-4 7 4 7Z"/><path d="M5 12h14"/></svg>
+                        </button>
+                    </div>
+                    <div class="input-hint">
+                        <span>Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <script src="/js/config.js?v=2.0"></script>
+    <script src="/js/app.js?v=2.0"></script>
+</body>
+</html>
