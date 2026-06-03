@@ -4,7 +4,7 @@ import sys
 
 # Define a more comprehensive emoji pattern or simply rely on character ranges
 # This covers most standard emojis
-emoji_pattern = re.compile(r'[\U0001f300-\U0001f64f\U0001f680-\U0001f6ff\U0002600-\U00026ff\U0002700-\U00027bf\U0001f900-\U0001f9ff\U0001fa70-\U0001faff]', flags=re.UNICODE)
+emoji_pattern = re.compile(r'[\U0001f300-\U0001f64f\U0001f680-\U0001f6ff\U00002600-\U000026ff\U00002700-\U000027bf\U0001f900-\U0001f9ff\U0001fa70-\U0001faff]', flags=re.UNICODE)
 
 cwd = os.getcwd()
 
