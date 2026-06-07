@@ -1,4 +1,16 @@
+---
+title: TubeMind Backend
+emoji: 🎬
+colorFrom: purple
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+short_description: AI-powered YouTube Q&A using RAG, FastAPI & Gemini
+---
+
 # TubeMind
+
 
 **AI-powered understanding for every YouTube video.**
 
