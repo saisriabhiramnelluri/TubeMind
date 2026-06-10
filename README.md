@@ -1,182 +1,100 @@
----
-title: TubeMind Backend
-emoji: 🎬
-colorFrom: purple
-colorTo: blue
-sdk: docker
-app_port: 7860
-pinned: false
-short_description: AI-powered YouTube Q&A using RAG, FastAPI & Gemini
----
+# TubeMind - AI-Powered YouTube Knowledge Assistant
 
-# TubeMind
+## Project Overview
+TubeMind is a sophisticated AI-powered application that transforms YouTube video content into an interactive, searchable knowledge base. Leveraging Retrieval-Augmented Generation (RAG), the system processes video transcripts, performs semantic chunking with precise timestamp preservation, and utilizes Google's Gemini Large Language Model to deliver highly accurate, context-aware responses to user queries.
 
+## Key Technical Features
+* **Advanced Content Ingestion:** Automated extraction of YouTube transcripts using robust integrations (`youtube-transcript-api` and `yt-dlp`).
+* **Temporal Data Chunking:** Implementation of precision-based text chunking strategies that maintain strict alignment with video timestamps, ensuring accurate citation in responses.
+* **High-Performance Vector Search:** Integration of FAISS (Facebook AI Similarity Search) for optimized, sub-second semantic retrieval of transcript data.
+* **Grounded AI Responses:** Utilization of the Gemini LLM tailored via system prompts to mitigate hallucinations, ensuring answers are strictly derived from the ingested video context.
+* **Stateful Data Persistence:** A PostgreSQL database backing the application to persist embeddings and video metadata, allowing stateless deployment of the vector store (rebuilt in-memory upon initialization).
+* **Modern Architecture:** Built on FastAPI for asynchronous, high-throughput API endpoints, alongside a responsive, modern frontend utilizing vanilla web technologies.
 
-**AI-powered understanding for every YouTube video.**
+## System Architecture
 
-TubeMind is an AI-powered YouTube knowledge assistant that transforms videos into searchable, interactive conversations using Retrieval-Augmented Generation (RAG).
+The application follows a modular, microservice-inspired architecture pattern:
 
-Paste a YouTube URL, and TubeMind extracts the transcript, chunks it with timestamps, embeds it into a vector store, and lets you ask natural language questions with grounded answers and timestamp citations.
+1. **Ingestion Pipeline:** Validates URLs, extracts transcripts, chunks text, and generates vector embeddings via SentenceTransformers.
+2. **Storage Layer:** PostgreSQL for relational data and persistent embedding storage; FAISS for in-memory, high-speed similarity search.
+3. **Retrieval and Generation:** A custom RAG pipeline that intercepts user queries, retrieves the most relevant context vectors, and prompts the Gemini LLM for a formulated response with timestamp citations.
 
-![TubeMind](https://img.shields.io/badge/AI-TubeMind-purple?style=for-the-badge) ![Python](https://img.shields.io/badge/Python-3.11+-blue?style=for-the-badge) ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green?style=for-the-badge)
+### Technology Stack
+* **Backend Framework:** Python 3.11+, FastAPI, Uvicorn
+* **Database:** PostgreSQL (asyncpg, SQLAlchemy)
+* **Vector Store & Embeddings:** FAISS, SentenceTransformers (`all-MiniLM-L6-v2`)
+* **Large Language Model:** Google Gemini API (`gemini-2.5-flash`)
+* **Frontend Integration:** HTML5, CSS3, JavaScript
+* **Infrastructure & Deployment:** Docker, Docker Compose, Render Configuration
 
----
-
-## Features
-
-- **YouTube URL Ingestion** — Paste any YouTube link to extract its transcript
-- **Temporal Chunking** — Transcript is chunked with timestamp preservation
-- **Semantic Search** — FAISS-powered vector similarity search
-- **Grounded Answers** — Gemini generates answers strictly from transcript context
-- **Timestamp Citations** — Every answer includes clickable `[MM:SS]` citations
-- **Multi-Video Querying** — Ask questions across all ingested videos
-- **Premium UI** — Dark glassmorphism design with smooth animations
-
----
-
-## Architecture
-
-```
-User -> FastAPI -> Ingestion Pipeline -> FAISS + PostgreSQL
-                                           |
-User -> FastAPI -> Retriever -> Gemini LLM -> Grounded Answer + Citations
-```
-
-| Component | Technology |
-|-----------|------------|
-| Backend | FastAPI + Uvicorn |
-| LLM | Google Gemini (gemini-2.5-flash) |
-| Embeddings | SentenceTransformers (all-MiniLM-L6-v2) |
-| Vector Store | FAISS (in-memory, rebuilt from PostgreSQL) |
-| Database | PostgreSQL (asyncpg + SQLAlchemy) |
-| Transcripts | youtube-transcript-api + yt-dlp |
-| Frontend | Vanilla HTML/CSS/JS |
-| Deployment | Docker + Render |
-
----
-
-## Quick Start
+## Local Development Setup
 
 ### Prerequisites
+* Python 3.11 or higher
+* PostgreSQL instance (local or remote)
+* Active Google Gemini API Key
 
-- Python 3.11+
-- PostgreSQL (local or cloud)
-- [Gemini API Key](https://aistudio.google.com/)
+### Installation
 
-### 1. Clone & Install
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd tubemind
+   ```
+
+2. **Initialize a virtual environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Environment Configuration:**
+   Copy the example environment variables and configure your specific credentials.
+   ```bash
+   cp .env.example .env
+   ```
+   Ensure `GEMINI_API_KEY` and `DATABASE_URL` are accurately populated in your `.env` file.
+
+5. **Run the application:**
+   ```bash
+   uvicorn app.main:app --reload --port 8000
+   ```
+   The API and frontend will be accessible at `http://localhost:8000`.
+
+## Containerized Deployment
+
+For environment consistency, the application can be run using Docker:
 
 ```bash
-git clone <your-repo-url>
-cd tubemind
-
-python -m venv venv
-venv\Scripts\activate        # Windows
-# source venv/bin/activate   # macOS/Linux
-
-pip install -r requirements.txt
-```
-
-### 2. Configure Environment
-
-```bash
-copy .env.example .env
-# Edit .env with your GEMINI_API_KEY and DATABASE_URL
-```
-
-### 3. Run
-
-```bash
-uvicorn app.main:app --reload --port 8000
-```
-
-Open **http://localhost:8000** in your browser.
-
----
-
-## Docker
-
-```bash
-# Copy and configure .env
-copy .env.example .env
-
-# Start app + PostgreSQL
+cp .env.example .env
 docker-compose up --build
 ```
 
----
+### Production Deployment (Render)
+The repository includes a `render.yaml` configuration for streamlined deployment to the Render platform. It automatically provisions a web service instance and a PostgreSQL database. 
+*Note: Ensure the `DATABASE_URL` uses the `postgresql+asyncpg://` dialect prefix in the Render environment variables.*
 
-## Deploy to Render
+## API Specification
 
-1. Push your code to GitHub
-2. Go to [Render Dashboard](https://dashboard.render.com/)
-3. Click **New > Blueprint** and connect your repo
-4. Render will read `render.yaml` and create:
-   - Web service (Docker)
-   - PostgreSQL database
-5. Set `GEMINI_API_KEY` in the Render environment variables
-6. **Important**: Update `DATABASE_URL` to use `postgresql+asyncpg://` prefix instead of `postgresql://`
+The application exposes a fully documented RESTful API. Below are the primary endpoints:
 
----
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/ingest` | `POST` | Processes a YouTube URL and indexes its transcript. |
+| `/api/query` | `POST` | Executes a natural language query against indexed videos. |
+| `/api/videos` | `GET` | Retrieves a list of all processed video resources. |
+| `/api/videos/{id}` | `DELETE` | Removes a specific video and its associated embeddings. |
+| `/api/health` | `GET` | Application health diagnostic endpoint. |
 
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/ingest` | Ingest a YouTube video |
-| `POST` | `/api/query` | Ask a question |
-| `GET` | `/api/videos` | List ingested videos |
-| `DELETE` | `/api/videos/{id}` | Delete a video |
-| `GET` | `/api/health` | Health check |
-
-### Example: Ingest a Video
-
-```bash
-curl -X POST http://localhost:8000/api/ingest \
-  -H "Content-Type: application/json" \
-  -d '{"youtube_url": "https://www.youtube.com/watch?v=VIDEO_ID"}'
-```
-
-### Example: Ask a Question
-
-```bash
-curl -X POST http://localhost:8000/api/query \
-  -H "Content-Type: application/json" \
-  -d '{"question": "What are the main topics discussed?", "video_id": "VIDEO_ID"}'
-```
-
----
-
-## Project Structure
-
-```
-├── app/
-│   ├── main.py                 # FastAPI entry point
-│   ├── config.py               # Settings
-│   ├── api/                    # API endpoints
-│   ├── ingestion/              # Transcript extraction & processing
-│   ├── embeddings/             # SentenceTransformer wrapper
-│   ├── vectorstore/            # FAISS index management
-│   ├── rag/                    # RAG pipeline & Gemini integration
-│   ├── db/                     # PostgreSQL models & connection
-│   └── middleware/             # Logging & error handling
-├── frontend/                   # HTML/CSS/JS UI
-├── Dockerfile
-├── docker-compose.yml
-├── render.yaml
-└── requirements.txt
-```
-
----
-
-## Key Engineering Concepts
-
-- **Temporal Chunking** — Preserves video timestamps for citation accuracy
-- **FAISS Rebuild from PostgreSQL** — Stateless deployment: FAISS index rebuilt on startup from DB-stored embeddings
-- **Grounded Generation** — System prompt forces LLM to answer only from provided context
-- **Hallucination Prevention** — "I don't know" responses when context is insufficient
-
----
+## Engineering Highlights
+* **Stateless Vector Store Management:** The FAISS index is intentionally designed to be stateless. It rebuilds asynchronously from PostgreSQL upon application startup, reducing persistent volume requirements and simplifying cloud deployments.
+* **Prompt Engineering for Hallucination Prevention:** The LLM integration includes strict boundary prompts, forcing the model to respond with "I don't know" when sufficient context is unavailable within the ingested transcripts.
+* **Asynchronous Database Operations:** Leverages `asyncpg` to ensure database I/O does not block the FastAPI event loop, maximizing concurrent request handling.
 
 ## License
-
-MIT
+This project is licensed under the MIT License.
